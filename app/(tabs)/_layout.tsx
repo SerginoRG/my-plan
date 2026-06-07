@@ -1,13 +1,16 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Tabs } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { router, Tabs } from "expo-router";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function TabsLayout() {
   return (
     <View style={styles.container}>
       <View style={styles.avatar}>
-        <Ionicons name="person-outline" size={24} color="#111" />
+        <TouchableOpacity onPress={() => router.push("/deconnecte/deconnecte")}>
+          <Ionicons name="person-outline" size={24} color="#111" />
+        </TouchableOpacity>
       </View>
+
       <Tabs screenOptions={{ headerShown: false }}>
         <Tabs.Screen
           name="home"

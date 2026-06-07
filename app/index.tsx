@@ -13,11 +13,12 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform, 
-  Button,
     Alert,
 } from "react-native";
 
 const { width, height } = Dimensions.get("window");
+
+
 
 export default function Index() {
   const [email, setEmail] = useState("");
@@ -92,7 +93,8 @@ export default function Index() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
-          {/* Header (Monté plus haut grâce au justifyContent et marginTop réduit) */}
+          {/* Header (M
+          onté plus haut grâce au justifyContent et marginTop réduit) */}
           <Text style={styles.title}>Connexion</Text>
           <Text style={styles.subtitle}>
             Accédez à votre tableau de bord de gestion des visiteurs.
