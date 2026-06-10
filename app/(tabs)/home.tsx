@@ -9,7 +9,9 @@ import {
   View,
 } from "react-native";
 
-const API_URL = "http://192.168.1.73:3000/api/visiteurs";
+const API_URL = process.env.EXPO_PUBLIC_API_URL
+  ? `${process.env.EXPO_PUBLIC_API_URL}/api/visiteurs`
+  : "http://192.168.1.73:3000/api/visiteurs";
 
 type Visitor = {
   id: number;

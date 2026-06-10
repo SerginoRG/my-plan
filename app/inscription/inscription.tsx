@@ -1,23 +1,24 @@
-import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
+  Dimensions,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Dimensions,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-  Image,
 } from "react-native";
 
 const { width, height } = Dimensions.get("window");
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Inscription() {
   const [nom, setNom] = useState("");
@@ -44,24 +45,24 @@ export default function Inscription() {
   };
 
   // Fonction pour ouvrir la caméra
-//   const takePhoto = async () => {
-//     const permission = await ImagePicker.requestCameraPermissionsAsync();
+  //   const takePhoto = async () => {
+  //     const permission = await ImagePicker.requestCameraPermissionsAsync();
 
-//     if (!permission.granted) {
-//       Alert.alert("Permission requise", "L'accès à la caméra a été refusé.");
-//       return;
-//     }
+  //     if (!permission.granted) {
+  //       Alert.alert("Permission requise", "L'accès à la caméra a été refusé.");
+  //       return;
+  //     }
 
-//     const result = await ImagePicker.launchCameraAsync({
-//       allowsEditing: true,
-//       aspect: [1, 1],
-//       quality: 1,
-//     });
+  //     const result = await ImagePicker.launchCameraAsync({
+  //       allowsEditing: true,
+  //       aspect: [1, 1],
+  //       quality: 1,
+  //     });
 
-//     if (!result.canceled) {
-//       setImage(result.assets[0].uri);
-//     }
-//   };
+  //     if (!result.canceled) {
+  //       setImage(result.assets[0].uri);
+  //     }
+  //   };
 
   // Menu d'alerte pour choisir la source de l'image
   const choosePhotoProvider = () => {
@@ -72,62 +73,59 @@ export default function Inscription() {
         // { text: "Prendre une photo", onPress: takePhoto },
         { text: "Choisir depuis la galerie", onPress: pickImage },
         { text: "Annuler", style: "cancel" },
-      ]
+      ],
     );
   };
 
   const handleRegister = async () => {
-  if (!nom || !email || !password) {
-    Alert.alert("Erreur", "Veuillez remplir tous les champs.");
-    return;
-  }
-
-  if (password !== confirmPassword) {
-    Alert.alert("Erreur", "Les mots de passe ne correspondent pas.");
-    return;
-  }
-
-  if (!acceptedTerms) {
-    Alert.alert("Erreur", "Veuillez accepter les conditions.");
-    return;
-  }
-
-  try {
-    const response = await fetch("http://192.168.1.73:3000/api/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: nom,
-        email: email,
-        password: password,
-        image: image,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      Alert.alert("Succès", "Compte créé avec succès !");
-      // console.log(data);
-
-      setNom("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      setImage(null);
-    } else {
-      Alert.alert("Erreur", data.erreur);
+    if (!nom || !email || !password) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+      return;
     }
-  } catch (error) {
-    console.error(error);
-    Alert.alert(
-      "Erreur",
-      "Impossible de contacter le serveur."
-    );
-  }
-};
+
+    if (password !== confirmPassword) {
+      Alert.alert("Erreur", "Les mots de passe ne correspondent pas.");
+      return;
+    }
+
+    if (!acceptedTerms) {
+      Alert.alert("Erreur", "Veuillez accepter les conditions.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/users`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: nom,
+          email: email,
+          password: password,
+          image: image,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert("Succès", "Compte créé avec succès !");
+        // console.log(data);
+
+        setNom("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        setImage(null);
+      } else {
+        Alert.alert("Erreur", data.erreur);
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Erreur", "Impossible de contacter le serveur.");
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -154,10 +152,9 @@ export default function Inscription() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
-          
           {/* Bouton Retour & Titre principal */}
           <View style={styles.headerContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.backButton}
               onPress={() => router.push("/")}
             >
@@ -172,8 +169,8 @@ export default function Inscription() {
 
           {/* --- Zone Photo de Profil dynamique --- */}
           <View style={styles.avatarContainer}>
-            <TouchableOpacity 
-              style={styles.avatarDashedCircle} 
+            <TouchableOpacity
+              style={styles.avatarDashedCircle}
               activeOpacity={0.7}
               onPress={choosePhotoProvider}
             >
@@ -192,7 +189,7 @@ export default function Inscription() {
           </View>
 
           {/* --- Formulaire --- */}
-          
+
           {/* Nom complet */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Nom complet</Text>
@@ -223,7 +220,12 @@ export default function Inscription() {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Mot de passe</Text>
             <View style={styles.iconInputContainer}>
-              <Ionicons name="lock-closed-outline" size={22} color="#1a1a1a" style={styles.leftIcon} />
+              <Ionicons
+                name="lock-closed-outline"
+                size={22}
+                color="#1a1a1a"
+                style={styles.leftIcon}
+              />
               <TextInput
                 style={styles.iconInput}
                 placeholder="••••••••"
@@ -250,7 +252,12 @@ export default function Inscription() {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Confirmer le mot de passe</Text>
             <View style={styles.iconInputContainer}>
-              <Ionicons name="refresh-outline" size={22} color="#1a1a1a" style={styles.leftIcon} />
+              <Ionicons
+                name="refresh-outline"
+                size={22}
+                color="#1a1a1a"
+                style={styles.leftIcon}
+              />
               <TextInput
                 style={styles.iconInput}
                 placeholder="••••••••"
@@ -274,15 +281,21 @@ export default function Inscription() {
           </View>
 
           {/* --- Case à cocher : Conditions d'utilisation --- */}
-          <TouchableOpacity 
-            style={styles.checkboxContainer} 
+          <TouchableOpacity
+            style={styles.checkboxContainer}
             activeOpacity={0.8}
             onPress={() => setAcceptedTerms(!acceptedTerms)}
           >
-            <View style={[styles.checkbox, acceptedTerms && styles.checkboxChecked]}>
-              {acceptedTerms && <Ionicons name="checkmark" size={14} color="#fff" />}
+            <View
+              style={[styles.checkbox, acceptedTerms && styles.checkboxChecked]}
+            >
+              {acceptedTerms && (
+                <Ionicons name="checkmark" size={14} color="#fff" />
+              )}
             </View>
-            <Text style={styles.checkboxLabel}>J'accepte les conditions d'utilisation</Text>
+            <Text style={styles.checkboxLabel}>
+              J'accepte les conditions d'utilisation
+            </Text>
           </TouchableOpacity>
 
           {/* --- Bouton S'inscrire --- */}
@@ -308,7 +321,6 @@ export default function Inscription() {
               <Text style={styles.loginLink}>Se connecter</Text>
             </TouchableOpacity>
           </View>
-
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -330,7 +342,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "ios" ? 60 : 40,
     width: "100%",
   },
-  
+
   // --- HEADER ARROW + TITLE ---
   headerContainer: {
     flexDirection: "row",
@@ -467,7 +479,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#444",
   },
-  
+
   // --- BOUTON DE CONFIRMATION ---
   registerButton: {
     borderRadius: 30,
@@ -489,7 +501,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
   },
-  
+
   // --- FOOTER LINK ---
   loginContainer: {
     flexDirection: "row",

@@ -1,24 +1,23 @@
 // app/index.tsx
-import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Dimensions,
-  KeyboardAvoidingView,
-  Platform, 
-    Alert,
 } from "react-native";
 
 const { width, height } = Dimensions.get("window");
-
-
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export default function Index() {
   const [email, setEmail] = useState("");
@@ -26,15 +25,13 @@ export default function Index() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-  if (!email || !password) {
-    Alert.alert("Erreur", "Veuillez remplir tous les champs.");
-    return;
-  }
+    if (!email || !password) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+      return;
+    }
 
-  try {
-    const response = await fetch(
-      "http://192.168.1.73:3000/api/users/login",
-      {
+    try {
+      const response = await fetch(`${API_URL}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,38 +40,34 @@ export default function Index() {
           email,
           password,
         }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        Alert.alert("Erreur", data.erreur);
+        return;
       }
-    );
 
-    const data = await response.json();
+      // Alert.alert("Succès", data.message);
 
-    if (!response.ok) {
-      Alert.alert("Erreur", data.erreur);
-      return;
+      // console.log("Utilisateur connecté :", data.user);
+
+      router.replace("/home");
+    } catch (error) {
+      Alert.alert("Erreur de connexion", "Impossible de contacter le serveur.");
     }
-
-    // Alert.alert("Succès", data.message);
-
-    // console.log("Utilisateur connecté :", data.user);
-
-  router.replace("/home");
-  } catch (error) {
-    Alert.alert(
-      "Erreur de connexion",
-      "Impossible de contacter le serveur."
-    );
-  }
-};
+  };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.mainContainer}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       {/* --- ARRIÈRE-PLAN AVEC LES BULLES FLOUES --- */}
       <View style={StyleSheet.absoluteFillObject}>
         <View style={[styles.bubble, styles.topLeftBubble]} />
-        
+
         <LinearGradient
           colors={["rgba(0, 163, 224, 0.4)", "rgba(90, 125, 154, 0.1)"]}
           style={[styles.bubble, styles.topRightBubble]}
@@ -122,7 +115,7 @@ export default function Index() {
                 <Text style={styles.forgotPassword}>Oublié ?</Text>
               </TouchableOpacity>
             </View>
-            
+
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
@@ -163,18 +156,16 @@ export default function Index() {
           </TouchableOpacity>
         </View>
 
-      
-      {/* --- LIEN D'INSCRIPTION FIXÉ STRICTEMENT EN BAS --- */}
-      <View style={styles.fixedSignupContainer}>
-        <Text style={styles.signupText}>Pas encore de compte ?</Text>
-        <TouchableOpacity
-          onPress={() => router.push("/inscription/inscription")}
+        {/* --- LIEN D'INSCRIPTION FIXÉ STRICTEMENT EN BAS --- */}
+        <View style={styles.fixedSignupContainer}>
+          <Text style={styles.signupText}>Pas encore de compte ?</Text>
+          <TouchableOpacity
+            onPress={() => router.push("/inscription/inscription")}
           >
-          <Text style={styles.signupLink}>Créer un compte</Text>
-        </TouchableOpacity>
-      </View>
-
-          </ScrollView>
+            <Text style={styles.signupLink}>Créer un compte</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -187,16 +178,16 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     // Changement ici : "flex-start" au lieu de "flex-end" pour pousser le contenu vers le haut (zone verte)
-    justifyContent: "flex-start", 
+    justifyContent: "flex-start",
     // On laisse de l'espace en bas pour que le contenu ne vienne pas sous le bouton fixe
-    paddingBottom: 100, 
+    paddingBottom: 100,
   },
   content: {
     paddingHorizontal: 28,
     paddingVertical: 40,
     width: "100%",
   },
-  
+
   // --- STYLES DES BULLES D'ARRIÈRE-PLAN ---
   bubble: {
     position: "absolute",
@@ -233,7 +224,7 @@ const styles = StyleSheet.create({
     color: "#1a1a1a",
     letterSpacing: -0.5,
     // marginTop réduit pour coller au plus haut de la zone verte
-    marginTop: height * 0.05, 
+    marginTop: height * 0.05,
   },
   subtitle: {
     fontSize: 16,
@@ -289,7 +280,7 @@ const styles = StyleSheet.create({
   eyeIcon: {
     paddingLeft: 10,
   },
-  
+
   // --- BOUTON DE CONNEXION ---
   loginButton: {
     marginTop: 15,
@@ -311,7 +302,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
   },
-  
+
   // --- NOUVEAU STYLE POUR RENDRE LE BLOC COMPTE FIXE EN BAS ---
   fixedSignupContainer: {
     position: "absolute",
